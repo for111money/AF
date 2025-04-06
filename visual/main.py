@@ -21,11 +21,11 @@ def calculate_sharpness(image):
 
 
 if __name__ == "__main__":
+    cap = cv2.VideoCapture(0)
+    data_dirt = {}
     for i in range(10):
-        cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             raise RuntimeError("无法打开摄像头")
-        data_dirt = {}
         ret, frame = cap.read()
         if not ret:
             print("无法读取视频帧")
@@ -36,17 +36,17 @@ if __name__ == "__main__":
         print(f"当前帧锐度: {sharpness:.2f}")
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
         Encoder_value = random.random()
-        data_dirt[i] = {'image': cap,
-                        'features' : [sharpness, Encoder_value, timestamp]}
+        data_dirt[i] = {'image': cropped,
+                        'features': [sharpness, Encoder_value, timestamp]}
         cv2.imshow("Center Cropped Region", cropped)
-
         key = cv2.waitKey(2000)   # 延时2s
-    max_sharpness = max(data_dirt, key = lambda k: data_dirt[k]['features'][0])
+    max_sharpness = max(data_dirt, key=lambda k: data_dirt[k]['features'][0])
     print(f"最清晰图像的锐度是:{data_dirt[max_sharpness]['features'][0]:.2f}")
     cv2.imshow("Center Cropped Region", data_dirt[max_sharpness]['image'])
+    key = cv2.waitKey(5000)  # 延时2s
 
-    for i in range(10):
-        print(f"锐度值{data_dirt[i]['features'][0]:.2f}")
+    for key in data_dirt.keys():
+        print(f"锐度值{data_dirt[key]['features'][0]:.2f}")
     cv2.destroyAllWindows()
 
     '''
