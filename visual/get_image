@@ -1,0 +1,23 @@
+import cv2
+
+cap = cv2.VideoCapture(0)  # 0 代表默认相机，如果有多个相机，可能是 1、2...
+
+# 设置参数
+'''
+cap.set(cv2.CAP_PROP_EXPOSURE, -8)  # 曝光度（部分相机可能无效）
+cap.set(cv2.CAP_PROP_BRIGHTNESS, 0)  # 亮度
+cap.set(cv2.CAP_PROP_CONTRAST, 50)  # 对比度
+cap.set(cv2.CAP_PROP_SATURATION, 50)  # 饱和度
+cap.set(cv2.CAP_PROP_WHITE_BALANCE_BLUE_U, 40)  # 白平衡（部分相机支持）
+'''
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+    cv2.imshow("Camera", frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):  # 按 'q' 退出
+        break
+
+cap.release()
+cv2.destroyAllWindows()
