@@ -26,3 +26,12 @@ def encoder_delta(now_raw, last_raw):
     total_delta = turn_delta * MAX_ANGLE + angle_delta
 
     return total_delta  # 单位：编码器角度单位（0~16384 表示 360°）
+
+
+
+角度环绕：
+def angle_delta(now, last, max_angle=0x4000):
+    """计算角度差值（考虑回绕），范围为 -8192 ~ +8191"""
+    delta = (now - last + (max_angle // 2)) % max_angle - (max_angle // 2)
+    return delta
+
