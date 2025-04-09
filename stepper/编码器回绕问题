@@ -1,0 +1,28 @@
+#编码器回绕问题：电机编码器控制我现在有个问题，编码器在0位时，正转一圈变成01，01-0=1，我知道转了一圈；
+  反转变成4294967295，4294967295-0不为1，无法得到正确结果，正常运动条件下，我无法得知正转还是反转。
+def parse_encoder(raw_value):
+    """从 48 位编码器值中提取圈数和角度"""
+    turns = (raw_value >> 16) & 0xFFFFFFFF  # 高32位
+    angle = raw_value & 0xFFFF             # 低16位
+    return turns, angle
+
+
+def encoder_delta(now_raw, last_raw):
+    """计算编码器从 last 到 now 的位置增量（单位：角度单位，最大值 0x4000）"""
+    MAX_ANGLE = 0x4000  # 16384
+    MAX_UINT32 = 0xFFFFFFFF
+
+    now_turn, now_angle = parse_encoder(now_raw)
+    last_turn, last_angle = parse_encoder(last_raw)
+
+    # 计算圈数差值（处理回绕）
+    turn_delta = (now_turn - last_turn + (1 << 31)) & MAX_UINT32
+    turn_delta = turn_delta - (1 << 31)
+
+    # 计算角度差值（处理回绕）
+    angle_delta = (now_angle - last_angle + (MAX_ANGLE // 2)) % MAX_ANGLE - (MAX_ANGLE // 2)
+
+    # 总角度变化 = 圈数变化 × 每圈角度 + 当前圈内角度变化
+    total_delta = turn_delta * MAX_ANGLE + angle_delta
+
+    return total_delta  # 单位：编码器角度单位（0~16384 表示 360°）
